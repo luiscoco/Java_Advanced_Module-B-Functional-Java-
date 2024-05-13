@@ -114,6 +114,143 @@ They demonstrate how to set up an executor, run tasks asynchronously, schedule t
 
 This framework is highly useful for handling complex multithreading scenarios with relative ease
 
+ I can provide more examples to help you understand different features of the Java Executor Framework. Let's explore some practical use cases and advanced features of the framework, including handling multiple futures, combining results, and handling exceptions.
+
+**Example 4: Handling Multiple Futures**
+
+This example demonstrates how to manage a list of Future objects, allowing you to execute multiple tasks and process their results as they become available
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class MultipleFuturesExample {
+    public static void main(String[] args) throws Exception {
+        ExecutorService executor = Executors.newFixedThreadPool(4);
+        List<Future<String>> futures = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            int taskId = i;
+            Callable<String> task = () -> "Task " + taskId + " executed";
+            futures.add(executor.submit(task));
+        }
+
+        for (Future<String> future : futures) {
+            System.out.println(future.get());  // Waits for the task to complete and prints the result
+        }
+
+        executor.shutdown();
+    }
+}
+```
+
+**Example 5: Combine Results from Callables**
+
+This example shows how to combine results from several Callable tasks that return values, such as calculating the sum of returned integers
+
+```java
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class CombineResultsExample {
+    public static void main(String[] args) throws Exception {
+        ExecutorService executor = Executors.newCachedThreadPool();
+        List<Future<Integer>> futures = new ArrayList<>();
+
+        for (int i = 0; i < 5; i++) {
+            int value = i * 10;
+            Callable<Integer> task = () -> {
+                Thread.sleep(100); // Simulate some computation
+                return value + 10;
+            };
+            futures.add(executor.submit(task));
+        }
+
+        int sum = 0;
+        for (Future<Integer> future : futures) {
+            sum += future.get();
+        }
+
+        System.out.println("Total sum: " + sum);
+
+        executor.shutdown();
+    }
+}
+```
+
+**Example 6: Handling Exceptions in Callable Tasks**
+
+This example illustrates how to handle exceptions that occur within Callable tasks
+
+It demonstrates proper error handling without terminating the program abruptly
+
+```java
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
+public class ExceptionHandlingExample {
+    public static void main(String[] args) {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        Callable<Integer> task = () -> {
+            throw new IllegalStateException("I throw an exception!");
+        };
+
+        Future<Integer> future = executor.submit(task);
+
+        try {
+            future.get();
+        } catch (ExecutionException ee) {
+            System.err.println("Task threw an exception!");
+            System.err.println(ee.getCause());
+        } catch (InterruptedException ie) {
+            Thread.currentThread().interrupt();  // set the interrupt flag
+            System.err.println("Task was interrupted!");
+        }
+
+        executor.shutdown();
+    }
+}
+```
+
+**Example 7: Scheduled Task with Fixed Rate**
+
+This example uses **ScheduledExecutorService** to **schedule a periodic task that executes repeatedly at fixed intervals**, regardless of the task's execution duration
+
+```java
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class ScheduledTaskFixedRateExample {
+    public static void main(String[] args) {
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+        Runnable task = () -> {
+            System.out.println("Executing Task at " + System.nanoTime());
+        };
+
+        // Initialize Delay - 0, Period - 2 seconds
+        scheduler.scheduleAtFixedRate(task, 0, 2, TimeUnit.SECONDS);
+
+        // Scheduler will keep running. To stop, you might use:
+        // scheduler.shutdown();
+    }
+}
+```
+
+These examples demonstrate how to use the Executor Framework effectively to handle multiple tasks, manage asynchronous computation, and deal with exceptions in Java, providing a robust foundation for concurrent programming in Java applications.
+
 ## 2. Fork/Join Framework in Java
 
 The Fork/Join Framework is a part of Java's java.util.concurrent package, specifically designed to help leverage multi-core processors effectively
