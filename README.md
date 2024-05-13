@@ -51,7 +51,7 @@ public class SimpleExecutorServiceExample {
 
 **Example 2: Using ScheduledExecutorService**
 
-This example demonstrates scheduling a task with a delay
+This example demonstrates **scheduling a task with a delay**
 
 ```java
 import java.util.concurrent.Executors;
@@ -77,7 +77,9 @@ public class ScheduledExecutorExample {
 
 **Example 3: Future and Callable**
 
-This example demonstrates how to use a Callable task that returns a result. The Future object can be used to retrieve this result
+This example demonstrates how to **use a Callable task that returns a result**
+
+The **Future** object can be used to retrieve this result
 
 ```java
 import java.util.concurrent.Callable;
@@ -108,17 +110,20 @@ public class CallableAndFutureExample {
     }
 }
 ```
+
 These examples illustrate basic usage of the Executor Framework in Java
 
 They demonstrate how to set up an executor, run tasks asynchronously, schedule tasks, and retrieve results from tasks that compute values
 
 This framework is highly useful for handling complex multithreading scenarios with relative ease
 
- I can provide more examples to help you understand different features of the Java Executor Framework. Let's explore some practical use cases and advanced features of the framework, including handling multiple futures, combining results, and handling exceptions.
+I can provide more examples to help you understand different features of the Java Executor Framework
+
+Let's explore some practical use cases and advanced features of the framework, including handling multiple futures, combining results, and handling exceptions
 
 **Example 4: Handling Multiple Futures**
 
-This example demonstrates how to manage a list of Future objects, allowing you to execute multiple tasks and process their results as they become available
+This example demonstrates how to **manage a list of Future** objects, allowing you to **execute multiple tasks** and **process their results** as they become available
 
 ```java
 import java.util.ArrayList;
@@ -150,7 +155,7 @@ public class MultipleFuturesExample {
 
 **Example 5: Combine Results from Callables**
 
-This example shows how to combine results from several Callable tasks that return values, such as calculating the sum of returned integers
+This example shows how to **combine results from several Callable tasks** that return values, such as calculating the **sum of returned integers**
 
 ```java
 import java.util.ArrayList;
@@ -188,9 +193,9 @@ public class CombineResultsExample {
 
 **Example 6: Handling Exceptions in Callable Tasks**
 
-This example illustrates how to handle exceptions that occur within Callable tasks
+This example illustrates how to **handle exceptions** that occur within Callable tasks
 
-It demonstrates proper error handling without terminating the program abruptly
+It demonstrates proper **error handling** without terminating the program abruptly
 
 ```java
 import java.util.concurrent.Callable;
