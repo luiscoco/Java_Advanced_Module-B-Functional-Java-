@@ -116,4 +116,122 @@ This framework is highly useful for handling complex multithreading scenarios wi
 
 ## 2. Fork/Join Framework in Java
 
+The Fork/Join Framework is a part of Java's java.util.concurrent package, specifically designed to help leverage multi-core processors effectively
 
+It is ideal for tasks that can be broken down into smaller, independent subtasks, which can be executed concurrently, and then combined to produce a final result
+
+This is achieved using a divide-and-conquer approach
+
+**Key Components**
+
+**ForkJoinPool**: The heart of the Fork/Join Framework. It is an implementation of ExecutorService that manages worker threads
+
+**RecursiveAction**: A recursive resultless ForkJoinTask (typically for side effects, such as array sorting)
+
+**RecursiveTask**: A recursive result-bearing ForkJoinTask
+
+**Principles of the Fork/Join Framework**
+
+Work-Stealing Algorithm: Worker threads that run out of tasks can "steal" tasks from other threads that are still busy
+
+Task Splitting/Forking: Large tasks are split (forked) into smaller tasks until the task size is small enough to be executed directly
+
+Joining Tasks: Results of subtasks are joined together to form the final result
+
+**Simple Examples**
+
+**Example 1: Using RecursiveAction**
+
+Here's an example using RecursiveAction for performing a simple task, like incrementing all elements of an array
+
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+
+public class SimpleRecursiveActionExample extends RecursiveAction {
+    private long[] array;
+    private int low;
+    private int high;
+    private static final int THRESHOLD = 1000; // This threshold can be adjusted based on the task size and system
+
+    public SimpleRecursiveActionExample(long[] array, int low, int high) {
+        this.array = array;
+        this.low = low;
+        this.high = high;
+    }
+
+    @Override
+    protected void compute() {
+        if (high - low < THRESHOLD) {
+            for (int i = low; i < high; ++i) {
+                array[i]++; // Incrementing each element by one
+            }
+        } else {
+            int mid = (low + high) >>> 1;
+            SimpleRecursiveActionExample left = new SimpleRecursiveActive(array, low, mid);
+            SimpleRecursiveActionExample right = new SimpleRecursiveActive(array, mid, high);
+            invokeAll(left, right);
+        }
+    }
+
+    public static void main(String[] args) {
+        long[] array = new long[2000];
+        ForkJoinPool pool = new ForkJoinPool();
+        SimpleRecursiveActionExample task = new SimpleRecursiveActionExample(array, 0, array.length);
+        pool.invoke(task);
+    }
+}
+```
+
+**Example 2: Using RecursiveTask**
+
+Here's an example using RecursiveTask to compute a value, such as finding the sum of an array
+
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+
+public class SimpleRecursiveTaskExample extends RecursiveTask<Long> {
+    private long[] array;
+    private int low;
+    private int high;
+    private static final int THRESHOLD = 1000;
+
+    public SimpleRecursiveTaskExample(long[] array, int low, int high) {
+        this.array = array;
+        this.low = low;
+        this.high = high;
+    }
+
+    @Override
+    protected Long compute() {
+        if (high - low < THRESHOLD) {
+            long sum = 0;
+            for (int i = low; i < high; ++i) {
+                sum += array[i];
+            }
+            return sum;
+        } else {
+            int mid = (low + high) >>> 1;
+            SimpleRecursiveTaskExample left = new SimpleRecursiveTaskExample(array, low, mid);
+            SimpleRecursiveTaskExample right = new SimpleRecursiveTaskExample(array, mid, high);
+            left.fork();
+            long rightResult = right.compute();
+            long leftResult = left.join();
+            return leftResult + rightResult;
+        }
+    }
+
+    public static void main(String[] args) {
+        long[] array = new long[4000]; // large array initialization with values
+        ForkJoinPool pool = new ForkJoinPool();
+        SimpleRecursiveTaskExample task = new SimpleRecursiveTaskExample(array, 0, array.length);
+        long sum = pool.invoke(task);
+        System.out.println("Sum: " + sum);
+    }
+}
+```
+
+These examples demonstrate the basic usage of the Fork/Join Framework, which is very effective for tasks that can be broken down recursively
+
+By understanding how to create and manage tasks with RecursiveAction and RecursiveTask, developers can effectively utilize multicore processors to enhance performance for suitable tasks
