@@ -759,7 +759,41 @@ new ParallelMatrixMultiplication(A, B, C, row + newSize, col + newSize, newSize)
 
 This subtask handles the multiplication for the bottom-right quadrant of C
 
+Base Case: When the size of the submatrix is less than or equal to THRESHOLD, the multiplication is performed directly using three nested loops.
 
+Recursive Case: When the size of the submatrix is greater than THRESHOLD, the task is split into four smaller subtasks
+
+Each **subtask** is responsible for **computing one quadrant** of the resulting matrix C
+
+The **invokeAll** method is used to **run these subtasks in parallel**
+
+**Recursive Task Splitting Example**
+
+Assume the original matrix size is 512 x 512 and THRESHOLD is 64. The recursive splitting would occur as follows:
+
+**First Split**:
+
+Each subtask handles a 256 x 256 submatrix
+
+**Second Split**:
+
+Each 256 x 256 submatrix is further split into four 128 x 128 submatrices
+
+**Third Split**:
+
+Each 128 x 128 submatrix is split into four 64 x 64 submatrices
+
+**No further split since 64 <= THRESHOLD**
+
+This recursive splitting continues until each **submatrix size** is **small** enough to be **computed directly**
+
+**Summary**
+
+The methodology for splitting the original matrix in the ParallelMatrixMultiplication class involves dividing the task into four smaller tasks whenever the size of the current submatrix is larger than the THRESHOLD
+
+Each subtask is responsible for computing a quadrant of the resulting matrix C
+
+This recursive approach effectively utilizes the Fork/Join Framework to perform parallel matrix multiplication, efficiently leveraging multi-core processors
 
 **Source code**
 
