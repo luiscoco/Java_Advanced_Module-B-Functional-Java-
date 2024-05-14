@@ -759,9 +759,9 @@ new ParallelMatrixMultiplication(A, B, C, row + newSize, col + newSize, newSize)
 
 This subtask handles the multiplication for the bottom-right quadrant of C
 
-Base Case: When the size of the submatrix is less than or equal to THRESHOLD, the multiplication is performed directly using three nested loops.
+**Base Case**: When the size of the submatrix is **less than or equal to THRESHOLD**, the multiplication is performed **directly** using **three nested loops**
 
-Recursive Case: When the size of the submatrix is greater than THRESHOLD, the task is split into four smaller subtasks
+**Recursive Case**: When the size of the submatrix is greater than THRESHOLD, the task is split into four smaller subtasks
 
 Each **subtask** is responsible for **computing one quadrant** of the resulting matrix C
 
