@@ -670,6 +670,99 @@ public class ParallelMaxFinder extends RecursiveTask<Integer> {
 
 This example demonstrates how to use RecursiveAction for parallel matrix multiplication
 
+The methodology for splitting the original matrix in the ParallelMatrixMultiplication code involves dividing the task into smaller subtasks recursively, where each subtask is responsible for computing a part of the resultant matrix
+
+Let's break down the code and the splitting strategy in detail
+
+**Original Matrix Multiplication**
+
+The original problem is to multiply two matrices A and B and store the result in matrix C
+
+The multiplication of two matrices involves computing the dot product of rows from matrix A with columns from matrix B
+
+**Splitting the Matrix**
+
+When the size of the submatrix exceeds the THRESHOLD, the task is split into four subtasks, each responsible for a quadrant of the result matrix C
+
+The main idea is to divide the problem into smaller parts until they are small enough to be computed directly
+
+**Splitting Methodology**
+
+Let's consider the current submatrix defined by row, col, and size. The new size of each submatrix will be size / 2
+
+Here is a visual representation of the splitting process for a matrix of size n x n:
+
+Before Splitting:
+
+```
+C (size x size)
+┌───────┬───────┐
+│       │       │
+│       │       │
+│       │       │
+├───────┼───────┤
+│       │       │
+│       │       │
+│       │       │
+└───────┴───────┘
+```
+
+After Splitting:
+
+```
+C (size x size)
+┌─────────────┬─────────────┐
+│   (row,     │   (row,     │
+│    col)     │    col +    │
+│             │    newSize) │
+│  (newSize)  │  (newSize)  │
+├─────────────┼─────────────┤
+│   (row +    │   (row +    │
+│    newSize, │    newSize, │
+│    col)     │    col +    │
+│             │    newSize) │
+│  (newSize)  │  (newSize)  │
+└─────────────┴─────────────┘
+```
+
+Each submatrix will have half the size of the original matrix:
+
+**Top-left submatrix**:
+
+```java
+new ParallelMatrixMultiplication(A, B, C, row, col, newSize)
+```
+
+This subtask handles the multiplication for the top-left quadrant of C
+
+**Top-right submatrix**:
+
+```java
+new ParallelMatrixMultiplication(A, B, C, row, col + newSize, newSize)
+```
+
+This subtask handles the multiplication for the top-right quadrant of C
+
+**Bottom-left submatrix**:
+
+```java
+new ParallelMatrixMultiplication(A, B, C, row + newSize, col, newSize)
+```
+
+This subtask handles the multiplication for the bottom-left quadrant of C
+
+**Bottom-right submatrix**:
+
+```java
+new ParallelMatrixMultiplication(A, B, C, row + newSize, col + newSize, newSize)
+```
+
+This subtask handles the multiplication for the bottom-right quadrant of C
+
+
+
+**Source code**
+
 ```java
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
