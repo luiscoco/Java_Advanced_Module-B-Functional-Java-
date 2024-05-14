@@ -412,7 +412,7 @@ The main method sets up the array, creates a **ForkJoinPool**, and runs the **pa
 
 This approach efficiently utilizes multiple cores to perform array processing tasks concurrently
 
-Here's an example using **RecursiveAction** for performing a simple task, like **incrementing all elements of an array**
+**Source Code**
 
 ```java
 import java.util.concurrent.ForkJoinPool;
@@ -563,7 +563,7 @@ It then **calculates the sum directly** or **splits the task and processes the s
 
 The main method sets up the array, creates a ForkJoinPool, and runs the parallel computation, efficiently utilizing multiple cores to perform the sum calculation concurrently
 
-Here's an example using **RecursiveTask** to compute a value, such as finding the **sum of an array**
+**Source Code** 
 
 ```java
 import java.util.concurrent.ForkJoinPool;
