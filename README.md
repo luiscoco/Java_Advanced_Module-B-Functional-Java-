@@ -871,7 +871,11 @@ public class ParallelMatrixMultiplication extends RecursiveAction {
 
 **Example 5: RecursiveTask for Parallel Merge Sort**
 
-This example demonstrates how to use RecursiveTask for implementing parallel merge sort
+This example demonstrates how to use RecursiveTask for implementing **parallel merge sort**
+
+It **compares elements from the left and right arrays** and **adds the smaller element to the result array**
+
+
 
 ```java
 import java.util.concurrent.ForkJoinPool;
