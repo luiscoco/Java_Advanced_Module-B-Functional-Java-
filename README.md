@@ -1,4 +1,4 @@
-# Java Advanced Module-B: Executor framework and Fork Join pool
+# Java Advanced (Module B): Executor framework and Fork Join pool
 
 ## 1. Executor Framework in Java
 
