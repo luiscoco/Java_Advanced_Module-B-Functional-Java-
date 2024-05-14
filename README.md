@@ -579,6 +579,137 @@ public class ParallelMergeSort extends RecursiveTask<int[]> {
 
 **Example 6: Using Work-Stealing Algorithm**
 
+This code demonstrates the use of the Fork/Join Framework in Java to process an array of integers using the **work-stealing algorithm**
+
+Here is a brief explanation of each part:
+
+Imports
+
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.TimeUnit;
+```
+
+These imports are necessary for:
+
+**ForkJoinPool**: The main class that manages the **worker threads**
+
+**RecursiveAction**: A base class for **tasks that do not return a result**
+
+**TimeUnit**: For time-based operations, specifically used **for sleeping**
+
+**Class Definition**
+
+```java
+public class WorkStealingDemo extends RecursiveAction {
+    private static final int THRESHOLD = 10;
+    private final int[] array;
+    private final int start;
+    private final int end;
+```
+
+**WorkStealingDemo extends RecursiveAction**, indicating that it performs a **task that doesn't return a result**
+
+The class has three fields:
+
+**THRESHOLD**: A constant that determines when to stop splitting tasks
+
+**array**: The array of integers to be processed
+
+**start and end**: Indices that define the range of the array to be processed
+
+**Constructor**
+
+```java
+Copy code
+public WorkStealingDemo(int[] array, int start, int end) {
+    this.array = array;
+    this.start = start;
+    this.end = end;
+}
+```
+
+This constructor initializes the fields with the provided array and the range to be processed
+
+**Compute Method**
+
+```java
+@Override
+protected void compute() {
+    if (end - start < THRESHOLD) {
+        for (int i = start; i < end; i++) {
+            array[i] = process(array[i]);
+        }
+    } else {
+        int mid = (start + end) / 2;
+        WorkStealingDemo leftTask = new WorkStealingDemo(array, start, mid);
+        WorkStealingDemo rightTask = new WorkStealingDemo(array, mid, end);
+        invokeAll(leftTask, rightTask);
+    }
+}
+```
+
+The compute method is where the task logic resides:
+
+If the task size is below the THRESHOLD, it processes the elements directly
+
+Otherwise, it splits the task into two subtasks and invokes them in parallel using invokeAll
+
+**Process Method**
+
+```java
+private int process(int value) {
+    try {
+        TimeUnit.MILLISECONDS.sleep(value);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    return value * 2;
+}
+```
+
+The process method simulates a time-consuming task by sleeping for a number of milliseconds equal to the element's value and then doubling the value
+
+**Main Method**
+
+```java
+public static void main(String[] args) {
+    int[] array = new int[100];
+    // Populate the array with values ranging from 1 to 100
+    for (int i = 0; i < array.length; i++) {
+        array[i] = i + 1;
+    }
+
+    ForkJoinPool pool = new ForkJoinPool();
+    WorkStealingDemo task = new WorkStealingDemo(array, 0, array.length);
+    pool.invoke(task);
+
+    // Print the processed array
+    for (int value : array) {
+        System.out.print(value + " ");
+    }
+}
+```
+
+Initializes an array of 100 integers with values from 1 to 100
+
+Creates a ForkJoinPool to manage the parallel execution
+
+Creates and invokes a WorkStealingDemo task with the entire array range
+
+Prints the processed array after the task completes
+
+**Summary**
+
+This code illustrates how to use the Fork/Join Framework to process an array in parallel, demonstrating task splitting, work-stealing, and recursive computation
+
+The compute method splits the tasks until they are small enough to be processed directly, leveraging multiple cores for efficient processing
+
+The process method simulates a computational task, and the main method sets up and runs the parallel computation
+
+**Source code**
+
 This example demonstrates the work-stealing algorithm by simulating a simple workload distribution scenario
 
 ```java
@@ -640,8 +771,10 @@ public class WorkStealingDemo extends RecursiveAction {
 }
 ```
 
-These examples illustrate the versatility of the Fork/Join Framework, showing how it can be used for parallel search, matrix multiplication, merge sort, and even demonstrating the work-stealing algorithm. By leveraging these capabilities, developers can efficiently utilize multi-core processors for complex and large-scale tasks.
+These examples illustrate the versatility of the Fork/Join Framework, showing how it can be used for parallel search, matrix multiplication, merge sort, and even demonstrating the work-stealing algorithm
 
-These examples demonstrate the basic usage of the Fork/Join Framework, which is very effective for tasks that can be broken down recursively
+By leveraging these capabilities, developers can efficiently utilize **multi-core processors** for complex and large-scale tasks
 
-By understanding how to create and manage tasks with RecursiveAction and RecursiveTask, developers can effectively utilize multicore processors to enhance performance for suitable tasks
+These examples demonstrate the basic usage of the **Fork/Join Framework**, which is very effective for **tasks that can be broken down recursively**
+
+By understanding how to create and manage tasks with **RecursiveAction** and **RecursiveTask**, developers can effectively utilize **multicore processors** to enhance performance for suitable tasks
