@@ -284,7 +284,7 @@ Joining Tasks: Results of subtasks are joined together to form the final result
 
 **Example 1: Using RecursiveAction**
 
-Here's an example using RecursiveAction for performing a simple task, like incrementing all elements of an array
+Here's an example using **RecursiveAction** for performing a simple task, like **incrementing all elements of an array**
 
 ```java
 import java.util.concurrent.ForkJoinPool;
@@ -327,7 +327,7 @@ public class SimpleRecursiveActionExample extends RecursiveAction {
 
 **Example 2: Using RecursiveTask**
 
-Here's an example using RecursiveTask to compute a value, such as finding the sum of an array
+Here's an example using **RecursiveTask** to compute a value, such as finding the **sum of an array**
 
 ```java
 import java.util.concurrent.ForkJoinPool;
@@ -373,6 +373,274 @@ public class SimpleRecursiveTaskExample extends RecursiveTask<Long> {
     }
 }
 ```
+
+**Example 3: RecursiveTask for Parallel Array Search**
+
+This example demonstrates how to use **RecursiveTask** to perform a parallel **search in an array to find the maximum value**
+
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+
+public class ParallelMaxFinder extends RecursiveTask<Integer> {
+    private static final int THRESHOLD = 1000;
+    private final int[] array;
+    private final int start;
+    private final int end;
+
+    public ParallelMaxFinder(int[] array, int start, int end) {
+        this.array = array;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Integer compute() {
+        if (end - start < THRESHOLD) {
+            int max = array[start];
+            for (int i = start + 1; i < end; i++) {
+                if (array[i] > max) {
+                    max = array[i];
+                }
+            }
+            return max;
+        } else {
+            int mid = (start + end) / 2;
+            ParallelMaxFinder leftTask = new ParallelMaxFinder(array, start, mid);
+            ParallelMaxFinder rightTask = new ParallelMaxFinder(array, mid, end);
+            leftTask.fork();
+            int rightResult = rightTask.compute();
+            int leftResult = leftTask.join();
+            return Math.max(leftResult, rightResult);
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] array = new int[10000];
+        // Populate the array with random values
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (int) (Math.random() * 10000);
+        }
+
+        ForkJoinPool pool = new ForkJoinPool();
+        ParallelMaxFinder task = new ParallelMaxFinder(array, 0, array.length);
+        int max = pool.invoke(task);
+        System.out.println("Max value: " + max);
+    }
+}
+```
+
+**Example 4: RecursiveAction for Matrix Multiplication**
+
+This example demonstrates how to use RecursiveAction for parallel matrix multiplication
+
+java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+
+public class ParallelMatrixMultiplication extends RecursiveAction {
+    private static final int THRESHOLD = 64;
+    private final double[][] A;
+    private final double[][] B;
+    private final double[][] C;
+    private final int row;
+    private final int col;
+    private final int size;
+
+    public ParallelMatrixMultiplication(double[][] A, double[][] B, double[][] C, int row, int col, int size) {
+        this.A = A;
+        this.B = B;
+        this.C = C;
+        this.row = row;
+        this.col = col;
+        this.size = size;
+    }
+
+    @Override
+    protected void compute() {
+        if (size <= THRESHOLD) {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    for (int k = 0; k < size; k++) {
+                        C[row + i][col + j] += A[row + i][k] * B[k][col + j];
+                    }
+                }
+            }
+        } else {
+            int newSize = size / 2;
+            invokeAll(
+                new ParallelMatrixMultiplication(A, B, C, row, col, newSize),
+                new ParallelMatrixMultiplication(A, B, C, row, col + newSize, newSize),
+                new ParallelMatrixMultiplication(A, B, C, row + newSize, col, newSize),
+                new ParallelMatrixMultiplication(A, B, C, row + newSize, col + newSize, newSize)
+            );
+        }
+    }
+
+    public static void main(String[] args) {
+        int n = 512; // Matrix size (must be a power of 2)
+        double[][] A = new double[n][n];
+        double[][] B = new double[n][n];
+        double[][] C = new double[n][n];
+
+        // Initialize matrices A and B with random values
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                A[i][j] = Math.random();
+                B[i][j] = Math.random();
+            }
+        }
+
+        ForkJoinPool pool = new ForkJoinPool();
+        ParallelMatrixMultiplication task = new ParallelMatrixMultiplication(A, B, C, 0, 0, n);
+        pool.invoke(task);
+
+        // Print the result matrix C
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                System.out.printf("%8.2f ", C[i][j]);
+            }
+            System.out.println();
+        }
+    }
+}
+```
+
+**Example 5: RecursiveTask for Parallel Merge Sort**
+
+This example demonstrates how to use RecursiveTask for implementing parallel merge sort
+
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+import java.util.Arrays;
+
+public class ParallelMergeSort extends RecursiveTask<int[]> {
+    private static final int THRESHOLD = 1000;
+    private final int[] array;
+
+    public ParallelMergeSort(int[] array) {
+        this.array = array;
+    }
+
+    @Override
+    protected int[] compute() {
+        if (array.length < THRESHOLD) {
+            Arrays.sort(array);
+            return array;
+        } else {
+            int mid = array.length / 2;
+            ParallelMergeSort leftTask = new ParallelMergeSort(Arrays.copyOfRange(array, 0, mid));
+            ParallelMergeSort rightTask = new ParallelMergeSort(Arrays.copyOfRange(array, mid, array.length));
+            invokeAll(leftTask, rightTask);
+            int[] leftResult = leftTask.join();
+            int[] rightResult = rightTask.join();
+            return merge(leftResult, rightResult);
+        }
+    }
+
+    private int[] merge(int[] left, int[] right) {
+        int[] result = new int[left.length + right.length];
+        int i = 0, j = 0, k = 0;
+        while (i < left.length && j < right.length) {
+            if (left[i] <= right[j]) {
+                result[k++] = left[i++];
+            } else {
+                result[k++] = right[j++];
+            }
+        }
+        while (i < left.length) {
+            result[k++] = left[i++];
+        }
+        while (j < right.length) {
+            result[k++] = right[j++];
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        int[] array = new int[10000];
+        // Populate the array with random values
+        for (int i = 0; i < array.length; i++) {
+            array[i] = (int) (Math.random() * 10000);
+        }
+
+        ForkJoinPool pool = new ForkJoinPool();
+        ParallelMergeSort task = new ParallelMergeSort(array);
+        int[] sortedArray = pool.invoke(task);
+
+        // Print the sorted array
+        for (int value : sortedArray) {
+            System.out.print(value + " ");
+        }
+    }
+}
+```
+
+**Example 6: Using Work-Stealing Algorithm**
+
+This example demonstrates the work-stealing algorithm by simulating a simple workload distribution scenario
+
+```java
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.TimeUnit;
+
+public class WorkStealingDemo extends RecursiveAction {
+    private static final int THRESHOLD = 10;
+    private final int[] array;
+    private final int start;
+    private final int end;
+
+    public WorkStealingDemo(int[] array, int start, int end) {
+        this.array = array;
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected void compute() {
+        if (end - start < THRESHOLD) {
+            for (int i = start; i < end; i++) {
+                array[i] = process(array[i]);
+            }
+        } else {
+            int mid = (start + end) / 2;
+            WorkStealingDemo leftTask = new WorkStealingDemo(array, start, mid);
+            WorkStealingDemo rightTask = new WorkStealingDemo(array, mid, end);
+            invokeAll(leftTask, rightTask);
+        }
+    }
+
+    private int process(int value) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(value);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return value * 2;
+    }
+
+    public static void main(String[] args) {
+        int[] array = new int[100];
+        // Populate the array with values ranging from 1 to 100
+        for (int i = 0; i < array.length; i++) {
+            array[i] = i + 1;
+        }
+
+        ForkJoinPool pool = new ForkJoinPool();
+        WorkStealingDemo task = new WorkStealingDemo(array, 0, array.length);
+        pool.invoke(task);
+
+        // Print the processed array
+        for (int value : array) {
+            System.out.print(value + " ");
+        }
+    }
+}
+```
+
+These examples illustrate the versatility of the Fork/Join Framework, showing how it can be used for parallel search, matrix multiplication, merge sort, and even demonstrating the work-stealing algorithm. By leveraging these capabilities, developers can efficiently utilize multi-core processors for complex and large-scale tasks.
 
 These examples demonstrate the basic usage of the Fork/Join Framework, which is very effective for tasks that can be broken down recursively
 
