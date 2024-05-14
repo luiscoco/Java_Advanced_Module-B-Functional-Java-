@@ -434,7 +434,7 @@ public class ParallelMaxFinder extends RecursiveTask<Integer> {
 
 This example demonstrates how to use RecursiveAction for parallel matrix multiplication
 
-java
+```java
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.RecursiveAction;
 
