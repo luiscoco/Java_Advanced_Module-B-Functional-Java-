@@ -875,7 +875,7 @@ This example demonstrates how to use RecursiveTask for implementing **parallel m
 
 It **compares elements from the left and right arrays** and **adds the smaller element to the result array**
 
-
+**After one of the arrays is fully processed**, any **remaining elements** from the other array are **added to the result array**
 
 ```java
 import java.util.concurrent.ForkJoinPool;
